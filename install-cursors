@@ -13,23 +13,23 @@ read -p ">>> " resolution
 
 case "$resolution" in
     1)
-		sudo rm -rf $installDir/Sonder*
+		sudo rm -rf $installDir/SONDER-*
         sudo cp -rf cursors/*24 $installDir
     ;;
     2)
-		sudo rm -rf $installDir/Sonder*
+		sudo rm -rf $installDir/SONDER-*
         sudo cp -rf cursors/*32 $installDir
     ;;
     3)
-		sudo rm -rf $installDir/Sonder*
+		sudo rm -rf $installDir/SONDER-*
         sudo cp -rf cursors/*48 $installDir
     ;;
     4)
-		sudo rm -rf $installDir/Sonder*
+		sudo rm -rf $installDir/SONDER-*
         sudo cp -rf cursors/*64 $installDir
     ;;
     5)
-		sudo rm -rf $installDir/Sonder*
+		sudo rm -rf $installDir/SONDER-*
         sudo cp -rf cursors/*96 $installDir
     ;;
     *)
