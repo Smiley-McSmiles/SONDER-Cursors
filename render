@@ -150,32 +150,32 @@ done
 iteration=0
 for color in "${colors[@]}"
 do
-	mkdir -p cursors/Sonder-$color-24/cursors
-	echo "[Icon Theme]" >> cursors/Sonder-$color-24/index.theme
-	echo "Name=Sonder-$color" >> cursors/Sonder-$color-24/index.theme
-	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-24/index.theme
-	mkdir -p cursors/Sonder-$color-32/cursors
-	echo "[Icon Theme]" >> cursors/Sonder-$color-36/index.theme
-	echo "Name=Sonder-$color" >> cursors/Sonder-$color-36/index.theme
-	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-36/index.theme
-	mkdir -p cursors/Sonder-$color-48/cursors
-	echo "[Icon Theme]" >> cursors/Sonder-$color-48/index.theme
-	echo "Name=Sonder-$color" >> cursors/Sonder-$color-48/index.theme
-	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-48/index.theme
-	mkdir -p cursors/Sonder-$color-64/cursors
-	echo "[Icon Theme]" >> cursors/Sonder-$color-64/index.theme
-	echo "Name=Sonder-$color" >> cursors/Sonder-$color-64/index.theme
-	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-64/index.theme
-	mkdir -p cursors/Sonder-$color-96/cursors
-	echo "[Icon Theme]" >> cursors/Sonder-$color-96/index.theme
-	echo "Name=Sonder-$color" >> cursors/Sonder-$color-96/index.theme
-	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-96/index.theme
+	mkdir -p cursors/SONDER-$color-24/cursors
+	echo "[Icon Theme]" >> cursors/SONDER-$color-24/index.theme
+	echo "Name=SONDER-$color" >> cursors/SONDER-$color-24/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/SONDER-$color-24/index.theme
+	mkdir -p cursors/SONDER-$color-32/cursors
+	echo "[Icon Theme]" >> cursors/SONDER-$color-36/index.theme
+	echo "Name=SONDER-$color" >> cursors/SONDER-$color-36/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/SONDER-$color-36/index.theme
+	mkdir -p cursors/SONDER-$color-48/cursors
+	echo "[Icon Theme]" >> cursors/SONDER-$color-48/index.theme
+	echo "Name=SONDER-$color" >> cursors/SONDER-$color-48/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/SONDER-$color-48/index.theme
+	mkdir -p cursors/SONDER-$color-64/cursors
+	echo "[Icon Theme]" >> cursors/SONDER-$color-64/index.theme
+	echo "Name=SONDER-$color" >> cursors/SONDER-$color-64/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/SONDER-$color-64/index.theme
+	mkdir -p cursors/SONDER-$color-96/cursors
+	echo "[Icon Theme]" >> cursors/SONDER-$color-96/index.theme
+	echo "Name=SONDER-$color" >> cursors/SONDER-$color-96/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/SONDER-$color-96/index.theme
 	
-	mkdir -p colors/Sonder-$color
-	cp -rf raw/* colors/Sonder-$color/
-	sed -i "s|raw/|colors/Sonder-$color/|g" colors/Sonder-$color/*/*.in
+	mkdir -p colors/SONDER-$color
+	cp -rf raw/* colors/SONDER-$color/
+	sed -i "s|raw/|colors/SONDER-$color/|g" colors/SONDER-$color/*/*.in
 	
-	for dir in colors/Sonder-$color/*
+	for dir in colors/SONDER-$color/*
 	do
 		for png in $dir/*
 		do
@@ -193,8 +193,8 @@ do
 	do
 		resolution=$(echo "$config" | rev | cut -c 4-5 | rev)
 		cursor=$(echo "$config" | rev | cut -c 7- | rev)
-		echo "> Running xcursorgen colors/Sonder-$color/$cursor/$config" "cursors/Sonder-$color-$resolution/cursors/$cursor"
-		xcursorgen "colors/Sonder-$color/$cursor/$config" "cursors/Sonder-$color-$resolution/cursors/$cursor"
+		echo "> Running xcursorgen colors/SONDER-$color/$cursor/$config" "cursors/SONDER-$color-$resolution/cursors/$cursor"
+		xcursorgen "colors/SONDER-$color/$cursor/$config" "cursors/SONDER-$color-$resolution/cursors/$cursor"
 	done
 	
 	iteration=$(bc <<< "$iteration+1")
