@@ -1,0 +1,307 @@
+#!/bin/bash
+
+blendFiles=(alias all-scroll cell col-resize context-menu copy crosshair default e-resize grab grabbing help ne-resize nesw-resize no-drop not-allowed n-resize ns-resize nw-resize nwse-resize pointer se-resize s-resize sw-resize text vertical-text w-resize zoom-out)
+animatedFiles=(progress wait)
+
+colors=(Orange Orange-Pastel Orange-Dark White Grey-25 Grey-50 Grey-75 Black Blue Blue-Pastel Blue-Dark Green Green-Pastel Green-Dark Yellow Yellow-Pastel Yellow-Dark Pink Pink-Pastel Pink-Dark Purple Purple-Pastel Purple-Dark Red Red-Pastel Red-Dark Mint Cyan Teal)
+values=("100,100,100" "130,100,100" "70,100,100" "200,0,100" "125,0,100" "75,0,100" "50,0,100" "0,0,100" "100,100,200" "130,100,200" "50,150,210" "100,100,155" "130,100,155" "70,130,155" "100,100,120" "130,100,120" "70,100,120" "100,100,265" "130,100,265" "70,100,265" "100,100,245" "130,100,245" "70,100,245" "75,250,280" "100,140,280" "40,250,280" "100,100,170" "100,100,185" "60,120,185")
+
+GetHotspot()
+{
+	cursor="$1"
+	resolution="$2"
+	pointer=(6x2 8x3 13x5 17x7 26x11)
+	center=(12x12 16x16 24x24 32x32 48x48)
+	pointers=("alias" "context-menu" "copy" "default" "help" "no-drop" "pointer" "progress" "zoom-out" "zoom-in")
+	isPointer=false
+	
+	for item in "${pointers[@]}"
+	do
+		if [[ "$item" == "$cursor" ]]; then
+			isPointer=true
+		fi
+	done
+	
+	if $isPointer; then
+		case "$resolution" in
+			24)
+				echo "${pointer[0]}"
+			;;
+			32)
+				echo "${pointer[1]}"
+			;;
+			48)
+				echo "${pointer[2]}"
+			;;
+			64)
+				echo "${pointer[3]}"
+			;;
+			96)
+				echo "${pointer[4]}"
+			;;
+		esac
+	else
+		case "$resolution" in
+			24)
+				echo "${center[0]}"
+			;;
+			32)
+				echo "${center[1]}"
+			;;
+			48)
+				echo "${center[2]}"
+			;;
+			64)
+				echo "${center[3]}"
+			;;
+			96)
+				echo "${center[4]}"
+			;;
+		esac
+	fi
+}
+
+for blendFile in "${blendFiles[@]}"
+do
+	cursor=$blendFile
+	dir="raw/$cursor/"
+	file="96_50_#.png"
+	file2="96_50_1.png"
+	blender -b blender/$cursor.blend -o "$dir/$file" -f 1 -F PNG
+	magick "$dir/$file2" -resize 64x64 "$dir/64_50_1.png"
+	magick "$dir/$file2" -resize 48x48 "$dir/48_50_1.png"
+	magick "$dir/$file2" -resize 32x32 "$dir/32_50_1.png"
+	magick "$dir/$file2" -resize 24x24 "$dir/24_50_1.png"
+done
+
+for animatedFile in "${animatedFiles[@]}"
+do
+	cursor=$animatedFile
+	dir="raw/$cursor"
+	file="96_16_###.png"
+	blender -b blender/$cursor.blend -o "$dir/$file" -a -F PNG
+	for frame in $dir/*
+	do
+		newFile=$(echo "$frame" | rev | cut -d / -f 1 | rev)
+		iteration=$(echo "$newFile" | cut -d "_" -f 3 | sed "s/.png//g")
+		echo "frame=$frame"
+		echo "iteration=$iteration"
+		magick "$frame" -resize 64x64 "$dir/64_16_$iteration.png"
+		magick "$frame" -resize 48x48 "$dir/48_16_$iteration.png"
+		magick "$frame" -resize 32x32 "$dir/32_16_$iteration.png"
+		magick "$frame" -resize 24x24 "$dir/24_16_$iteration.png"
+	done
+done
+
+configs=()
+for dir in raw/*
+do
+	cursorName=$(echo "$dir" | rev | cut -d / -f 1 | rev)
+	if [ -d "$dir" ]; then
+		for png in $dir/*
+		do
+			delay=$(echo "$png" | rev | cut -d / -f 1 | rev | cut -d "_" -f 2)
+			
+			if [[ "$png" =~ "24_" ]]; then
+				hotspot=$(GetHotspot "$cursorName" "24")
+				x=$(echo $hotspot | cut -d x -f 1)
+				y=$(echo $hotspot | cut -d x -f 2)
+				echo "24 $x $y $png $delay" >> "$dir/$cursorName-24.in"
+				if [[ ! ${configs[@]} =~ " $cursorName-24.in" ]]; then
+					configs+=("$cursorName-24.in")
+				fi
+			elif [[ "$png" =~ "32_" ]]; then
+				hotspot=$(GetHotspot "$cursorName" "32")
+				x=$(echo $hotspot | cut -d x -f 1)
+				y=$(echo $hotspot | cut -d x -f 2)
+				echo "32 $x $y $png $delay" >> "$dir/$cursorName-32.in"
+				if [[ ! ${configs[@]} =~ " $cursorName-32.in" ]]; then
+					configs+=("$cursorName-32.in")
+				fi
+			elif [[ "$png" =~ "48_" ]]; then
+				hotspot=$(GetHotspot "$cursorName" "48")
+				x=$(echo $hotspot | cut -d x -f 1)
+				y=$(echo $hotspot | cut -d x -f 2)
+				echo "48 $x $y $png $delay" >> "$dir/$cursorName-48.in"
+				if [[ ! ${configs[@]} =~ " $cursorName-48.in" ]]; then
+					configs+=("$cursorName-48.in")
+				fi
+			elif [[ "$png" =~ "64_" ]]; then
+				hotspot=$(GetHotspot "$cursorName" "64")
+				x=$(echo $hotspot | cut -d x -f 1)
+				y=$(echo $hotspot | cut -d x -f 2)
+				echo "64 $x $y $png $delay" >> "$dir/$cursorName-64.in"
+				if [[ ! ${configs[@]} =~ " $cursorName-64.in" ]]; then
+					configs+=("$cursorName-64.in")
+				fi
+			else
+				hotspot=$(GetHotspot "$cursorName" "96")
+				x=$(echo $hotspot | cut -d x -f 1)
+				y=$(echo $hotspot | cut -d x -f 2)
+				echo "96 $x $y $png $delay" >> "$dir/$cursorName-96.in"
+				if [[ ! ${configs[@]} =~ " $cursorName-96.in" ]]; then
+					configs+=("$cursorName-96.in")
+				fi
+			fi
+		done
+	fi
+done
+
+iteration=0
+for color in "${colors[@]}"
+do
+	mkdir -p cursors/Sonder-$color-24/cursors
+	echo "[Icon Theme]" >> cursors/Sonder-$color-24/index.theme
+	echo "Name=Sonder-$color" >> cursors/Sonder-$color-24/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-24/index.theme
+	mkdir -p cursors/Sonder-$color-32/cursors
+	echo "[Icon Theme]" >> cursors/Sonder-$color-36/index.theme
+	echo "Name=Sonder-$color" >> cursors/Sonder-$color-36/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-36/index.theme
+	mkdir -p cursors/Sonder-$color-48/cursors
+	echo "[Icon Theme]" >> cursors/Sonder-$color-48/index.theme
+	echo "Name=Sonder-$color" >> cursors/Sonder-$color-48/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-48/index.theme
+	mkdir -p cursors/Sonder-$color-64/cursors
+	echo "[Icon Theme]" >> cursors/Sonder-$color-64/index.theme
+	echo "Name=Sonder-$color" >> cursors/Sonder-$color-64/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-64/index.theme
+	mkdir -p cursors/Sonder-$color-96/cursors
+	echo "[Icon Theme]" >> cursors/Sonder-$color-96/index.theme
+	echo "Name=Sonder-$color" >> cursors/Sonder-$color-96/index.theme
+	echo "Comment=Author WOOSAH" >> cursors/Sonder-$color-96/index.theme
+	
+	mkdir -p colors/Sonder-$color
+	cp -rf raw/* colors/Sonder-$color/
+	sed -i "s|raw/|colors/Sonder-$color/|g" colors/Sonder-$color/*/*.in
+	
+	for dir in colors/Sonder-$color/*
+	do
+		for png in $dir/*
+		do
+			if [[ "$png" =~ ".png" ]]; then
+				echo "> Running: magick $png -modulate ${values[$iteration]} $png"
+				magick $png -modulate ${values[$iteration]} $png
+			else
+				echo "> $png is not a .png"
+			fi
+		done	
+	done
+
+	
+	for config in "${configs[@]}"
+	do
+		resolution=$(echo "$config" | rev | cut -c 4-5 | rev)
+		cursor=$(echo "$config" | rev | cut -c 7- | rev)
+		echo "> Running xcursorgen colors/Sonder-$color/$cursor/$config" "cursors/Sonder-$color-$resolution/cursors/$cursor"
+		xcursorgen "colors/Sonder-$color/$cursor/$config" "cursors/Sonder-$color-$resolution/cursors/$cursor"
+	done
+	
+	iteration=$(bc <<< "$iteration+1")
+done
+
+echo "Generating symbolic links..."
+
+for dir in cursors/*
+do
+	ln -s col-resize $dir/cursors/ew-resize
+	ln -s all-scroll $dir/cursors/move
+	ln -s ns-resize $dir/cursors/row-resize
+	ln -s copy $dir/cursors/zoom-in
+	ln -s progress $dir/cursors/00000000000000020006000e7e9ffc3f
+	ln -s progress $dir/cursors/08e8e1c95fe2fc01f976f1e063a24ccd
+	ln -s col-resize $dir/cursors/00008160000006810000408080010102
+	ln -s ns-resize $dir/cursors/028006030e0e7ebffc7f7070c0600140
+	ln -s not-allowed $dir/cursors/03b6e0fcb3499374a867c041f52298f0
+	ln -s copy $dir/cursors/1081e37283d90000800003c07f3ef6bf
+	ln -s col-resize $dir/cursors/14fef782d02440884392942c11205230
+	ln -s ns-resize $dir/cursors/2870a09082c103050810ffdffffe0204
+	ln -s alias $dir/cursors/3085a0e285430894940527032f8b26df
+	ln -s progress $dir/cursors/3ecb610c1bf2410f44200f48c40d3599
+	ln -s grabbing $dir/cursors/4498f0e0c1937ffe01fd06f973665830
+	ln -s help $dir/cursors/5c6cd98b3f3ebcb1f9c7f1c204630408
+	ln -s copy $dir/cursors/6407b0e94181790501fd1e167b474872
+	ln -s alias $dir/cursors/640fb0e74195791501fd1ed57b41487f
+	ln -s grabbing $dir/cursors/9081237383d90e509aa00f00170e968f
+	ln -s pointer $dir/cursors/9d800788f1b08800ae810202380a0822
+	ln -s alias $dir/cursors/a2a266d0498c3104214a47bd64ab0fc8
+	ln -s default $dir/cursors/arrow
+	ln -s copy $dir/cursors/b66166c04f8c3109214a4fbd64a50fc8
+	ln -s nwse-resize $dir/cursors/bd_double_arrow
+	ln -s sw-resize $dir/cursors/bottom_left_corner
+	ln -s se-resize $dir/cursors/bottom_right_corner
+	ln -s s-resize $dir/cursors/bottom_side
+	ln -s nwse-resize $dir/cursors/c7088f0f3e6c8088236ef8e1e3e70000
+	ln -s not-allowed $dir/cursors/circle
+	ln -s grabbing $dir/cursors/closedhand
+	ln -s crosshair $dir/cursors/cross
+	ln -s not-allowed $dir/cursors/crossed_circle
+	ln -s crosshair $dir/cursors/cross_reverse
+	ln -s help $dir/cursors/d9ce0ab605698f320427677b458ad60b
+	ln -s crosshair $dir/cursors/diamond_cross
+	ln -s help $dir/cursors/dnd-ask
+	ln -s copy $dir/cursors/dnd-copy
+	ln -s pointer $dir/cursors/dnd-link
+	ln -s grabbing $dir/cursors/dnd-move
+	ln -s no-drop $dir/cursors/dnd-no-drop
+	ln -s grabbing $dir/cursors/dnd-none
+	ln -s s-resize $dir/cursors/down-arrow
+	ln -s default $dir/cursors/draft
+	ln -s default $dir/cursors/draft_large
+	ln -s default $dir/cursors/draft_small
+	ln -s e-resize $dir/cursors/size_hor
+	ln -s nesw-resize $dir/cursors/fd_double_arrow
+	ln -s nesw-resize $dir/cursors/fcf1c3c7cd4491d801f1e1c78f100000
+	ln -s grabbing $dir/cursors/fcf21c00b30f7e3f83fe0dfd12e71cff
+	ln -s all-scroll $dir/cursors/fleur
+	ln -s no-drop $dir/cursors/forbidden
+	ln -s grab $dir/cursors/openhand
+	ln -s progress $dir/cursors/half-busy
+	ln -s pointer $dir/cursors/hand
+	ln -s pointer $dir/cursors/hand1
+	ln -s pointer $dir/cursors/hand2
+	ln -s e-resize $dir/cursors/h_double_arrow
+	ln -s text $dir/cursors/ibeam
+	ln -s w-resize $dir/cursors/left-arrow
+	ln -s default $dir/cursors/left_ptr
+	ln -s help $dir/cursors/left_ptr_help
+	ln -s progress $dir/cursors/left_ptr_watch
+	ln -s w-resize $dir/cursors/left_side
+	ln -s alias $dir/cursors/link
+	ln -s sw-resize $dir/cursors/ll_angle
+	ln -s se-resize $dir/cursors/lr_angle
+	ln -s n-resize $dir/cursors/size_ver
+	ln -s nwse-resize $dir/cursors/size_fdiag
+	ln -s default $dir/cursors/pencil
+	ln -s cell $dir/cursors/plus
+	ln -s pointer $dir/cursors/pointing_hand
+	ln -s help $dir/cursors/question_arrow
+	ln -s e-resize $dir/cursors/right-arrow
+	ln -s pointer $dir/cursors/right_ptr
+	ln -s e-resize $dir/cursors/right_side
+	ln -s s-resize $dir/cursors/sb_down_arrow
+	ln -s col-resize $dir/cursors/sb_h_double_arrow
+	ln -s w-resize $dir/cursors/sb_left_arrow
+	ln -s e-resize $dir/cursors/sb_right_arrow
+	ln -s n-resize $dir/cursors/sb_up_arrow
+	ln -s n-resize $dir/cursors/sb_v_double_arrow
+	ln -s all-scroll $dir/cursors/size_all
+	ln -s default $dir/cursors/size-bdiag
+	ln -s default $dir/cursors/size-fdiag
+	ln -s default $dir/cursors/size-hor
+	ln -s default $dir/cursors/size-ver
+	ln -s col-resize $dir/cursors/split_h
+	ln -s row-resize $dir/cursors/split_v
+	ln -s crosshair $dir/cursors/target
+	ln -s default $dir/cursors/top_left_arrow
+	ln -s nw-resize $dir/cursors/top_left_corner
+	ln -s ne-resize $dir/cursors/top_right_corner
+	ln -s n-resize $dir/cursors/top_side
+	ln -s nw-resize $dir/cursors/ul_angle
+	ln -s n-resize $dir/cursors/v_double_arrow
+	ln -s wait $dir/cursors/watch
+	ln -s help $dir/cursors/whats_this
+done
+
+echo "> DONE!"
+

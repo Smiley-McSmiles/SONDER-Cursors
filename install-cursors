@@ -1,0 +1,38 @@
+#!/bin/bash
+
+installDir=/usr/share/icons/
+
+echo "> Please select the resolution you'd like to install:"
+echo ""
+echo "1) 24px"
+echo "2) 32px"
+echo "3) 48px"
+echo "4) 64px"
+echo "5) 96px"
+read -p ">>> " resolution
+
+case "$resolution" in
+    1)
+		sudo rm -rf $installDir/Sonder*
+        sudo cp -rf cursors/*24 $installDir
+    ;;
+    2)
+		sudo rm -rf $installDir/Sonder*
+        sudo cp -rf cursors/*32 $installDir
+    ;;
+    3)
+		sudo rm -rf $installDir/Sonder*
+        sudo cp -rf cursors/*48 $installDir
+    ;;
+    4)
+		sudo rm -rf $installDir/Sonder*
+        sudo cp -rf cursors/*64 $installDir
+    ;;
+    5)
+		sudo rm -rf $installDir/Sonder*
+        sudo cp -rf cursors/*96 $installDir
+    ;;
+    *)
+        echo "> ERROR, unknown option!"
+    ;;
+esac
