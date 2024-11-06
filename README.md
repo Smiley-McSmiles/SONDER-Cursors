@@ -11,7 +11,7 @@
 ## Getting Started
 ```bash
 git clone https://github.com/Smiley-McSmiles/SONDER-Cursors
-cd Sonder-Cursors
+cd SONDER-Cursors
 chmod +x render
 ./render
 chmod +x install-cursors
